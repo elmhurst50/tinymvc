@@ -35,11 +35,6 @@ spl_autoload_register('autoload_model');
  */
 !file_exists(__SITE_PATH.'/vendor/autoload.php') ? : require_once __SITE_PATH.'/vendor/autoload.php';
 
-/*
- * Load classes on request from vendor/composer folder
- */
-! file_exists(__SITE_PATH . '/vendor/autoload.php') ? : require_once __SITE_PATH . '/vendor/autoload.php';
-
 
 
 /* * * a new registry object ** */
