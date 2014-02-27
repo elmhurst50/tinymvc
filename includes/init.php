@@ -22,7 +22,7 @@ function autoload_model($class_name) {
         return false;
     }
     include ($file);
-}
+} 
 
 /*
  * auto load from the model folder

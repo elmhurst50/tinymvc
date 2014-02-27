@@ -85,7 +85,7 @@ class router {
 	{
 		$action = $this->action;
                 array_shift($parts); // remove action
-                $this->registry->args = $parts;
+                $this->registry->args = $parts; 
 	}
 	/*** run the action ***/
 	$controller->$action();
