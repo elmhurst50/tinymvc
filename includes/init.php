@@ -33,6 +33,11 @@ spl_autoload_register('autoload_model');
 /*
  * Load classes on request from vendor/composer folder
  */
+!file_exists(__SITE_PATH.'/vendor/autoload.php') ? : require_once __SITE_PATH.'/vendor/autoload.php';
+
+/*
+ * Load classes on request from vendor/composer folder
+ */
 ! file_exists(__SITE_PATH . '/vendor/autoload.php') ? : require_once __SITE_PATH . '/vendor/autoload.php';
 
 
@@ -42,4 +47,4 @@ $registry = new registry;
 
 /* * * create the database registry object ** */
 // $registry->db = db::getInstance();
-?>
+
