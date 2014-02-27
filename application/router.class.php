@@ -56,8 +56,8 @@ class router {
  public function loader()
  {
 	/*** check the route ***/
-	$this->getController();
-
+	$parts = $this->getController();
+               
 	/*** if the file is not there diaf ***/
 	if (is_readable($this->file) == false)
 	{
@@ -71,15 +71,21 @@ class router {
 	/*** a new controller class instance ***/
 	$class = $this->controller . 'Controller';
 	$controller = new $class($this->registry);
+        
+        array_shift($parts); //remove controller
+      
 
 	/*** check if the action is callable ***/
 	if (is_callable(array($controller, $this->action)) == false)
 	{
 		$action = 'index';
+                $this->registry->args = $parts;
 	}
 	else
 	{
 		$action = $this->action;
+                array_shift($parts); // remove action
+                $this->registry->args = $parts;
 	}
 	/*** run the action ***/
 	$controller->$action();
@@ -128,9 +134,11 @@ private function getController() {
 
 	/*** set the file path ***/
 	$this->file = $this->path .'/'. $this->controller . 'Controller.php';
+        
+         /*** return array to allow transfer of url variable ***/
+        return $parts;
 }
 
 
 }
 
-?>
