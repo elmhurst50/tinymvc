@@ -1,144 +1,136 @@
 <?php
 
 class router {
- /*
- * @the registry
- */
- private $registry;
+    /*
+     * @the registry
+     */
 
- /*
- * @the controller path
- */
- private $path;
+    private $registry;
 
- private $args = array();
+    /*
+     * @the controller path
+     */
+    private $path;
+    private $args = array();
+    public $file;
+    public $controller;
+    public $action;
 
- public $file;
-
- public $controller;
-
- public $action; 
-
- function __construct($registry) {
+    function __construct($registry) {
         $this->registry = $registry;
- }
+    }
 
- /**
- *
- * @set controller directory path
- *
- * @param string $path
- *
- * @return void
- *
- */
- function setPath($path) {
+    /**
+     *
+     * @set controller directory path
+     *
+     * @param string $path
+     *
+     * @return void
+     *
+     */
+    function setPath($path) {
 
-	/*** check if path i sa directory ***/
-	if (is_dir($path) == false)
-	{
-		throw new Exception ('Invalid controller path: `' . $path . '`');
-	}
-	/*** set the path ***/
- 	$this->path = $path;
-}
+        /*         * * check if path i sa directory ** */
+        if (is_dir($path) == false) {
+            throw new Exception('Invalid controller path: `' . $path . '`');
+        }
+        /*         * * set the path ** */
+        $this->path = $path;
+    }
 
+    /**
+     *
+     * @load the controller
+     *
+     * @access public
+     *
+     * @return void
+     *
+     */
+    public function loader() {
+        /*         * * check the route ** */
+        $parts = $this->getController();
 
- /**
- *
- * @load the controller
- *
- * @access public
- *
- * @return void
- *
- */
- public function loader()
- {
-	/*** check the route ***/
-	$parts = $this->getController();
-               
-	/*** if the file is not there diaf ***/
-	if (is_readable($this->file) == false)
-	{
-		$this->file = $this->path.'/error404.php';
-                $this->controller = 'error404';
-	}
+        /*         * * if the file is not there diaf ** */
+        if (is_readable($this->file) == false) {
+            $this->file = $this->path . '/error404.php';
+            $this->controller = 'error404';
+        } else {
+            array_shift($parts); //remove controller to allow uri variable capture
+        }
 
-	/*** include the controller ***/
-	include $this->file;
+        /*         * * include the controller ** */
+        include $this->file;
 
-	/*** a new controller class instance ***/
-	$class = $this->controller . 'Controller';
-	$controller = new $class($this->registry);
-        
-        array_shift($parts); //remove controller
-      
+        /*         * * a new controller class instance ** */
+        $class = $this->controller . 'Controller';
+        $controller = new $class($this->registry);
 
-	/*** check if the action is callable ***/
-	if (is_callable(array($controller, $this->action)) == false)
-	{
-		$action = 'index';
-                $this->registry->args = $parts;
-	}
-	else
-	{
-		$action = $this->action;
-                array_shift($parts); // remove action
-                $this->registry->args = $parts; 
-	}
-	/*** run the action ***/
-	$controller->$action();
- }
+        $num_uri_parts = count($parts);
+
+        //if odd amount of uri variables then make the first the id field
+        if ($num_uri_parts % 2 !== 0) {
+            $gets["id"] = $parts[0];
+            array_shift($parts);
+        }
+
+//set array into associotive array with according values from uri
+        for ($x = 0; $x < count($parts); $x = $x + 2) {
+            $gets[$parts[$x]] = $parts[$x + 1];
+        }
+        $this->registry->args = $gets;
 
 
- /**
- *
- * @get the controller
- *
- * @access private
- *
- * @return void
- *
- */
-private function getController() {
+        /*         * * check if the action is callable ** */
+        if (is_callable(array($controller, $this->action)) == false) {
+            $action = 'index';
+        } else {
+            $action = $this->action;
+        }
+        /*         * * run the action ** */
+        $controller->$action();
+    }
 
-	/*** get the route from the url ***/
-	$route = (empty($_GET['rt'])) ? '' : $_GET['rt'];
+    /**
+     *
+     * @get the controller
+     *
+     * @access private
+     *
+     * @return void
+     *
+     */
+    private function getController() {
 
-	if (empty($route))
-	{
-		$route = 'index';
-	}
-	else
-	{
-		/*** get the parts of the route ***/
-		$parts = explode('/', $route);
-		$this->controller = $parts[0];
-		if(isset( $parts[1]))
-		{
-			$this->action = $parts[1];
-		}
-	}
+        /*         * * get the route from the url ** */
+        $route = (empty($_GET['rt'])) ? '' : $_GET['rt'];
 
-	if (empty($this->controller))
-	{
-		$this->controller = 'index';
-	}
+        if (empty($route)) {
+            $route = 'index';
+        } else {
+            /*             * * get the parts of the route ** */
+            $parts = explode('/', $route);
+            $this->controller = $parts[0];
+            if (isset($parts[1])) {
+                $this->action = $parts[1];
+            }
+        }
 
-	/*** Get action ***/
-	if (empty($this->action))
-	{
-		$this->action = 'index';
-	}
+        if (empty($this->controller)) {
+            $this->controller = 'index';
+        }
 
-	/*** set the file path ***/
-	$this->file = $this->path .'/'. $this->controller . 'Controller.php';
-        
-         /*** return array to allow transfer of url variable ***/
+        /*         * * Get action ** */
+        if (empty($this->action)) {
+            $this->action = 'index';
+        }
+
+        /*         * * set the file path ** */
+        $this->file = $this->path . '/' . $this->controller . 'Controller.php';
+
+        /*         * * return array to allow transfer of url variable ** */
         return $parts;
+    }
+
 }
-
-
-}
-
