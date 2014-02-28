@@ -37,6 +37,48 @@ spl_autoload_register('autoload_model');
 
 
 
+/* * ******************************************************
+ * Load classes based on namespace psr-0
+ */
+
+// holds namespace values 
+include 'psr0.php';
+
+/**
+ * Go through names spaces and create an array of possible folders to search for class file
+ */
+function psr0_autoload($class) {
+    $map = psr0values();
+    $classFolders = array();
+    $filename = strtolower($class) . '.php';
+
+    //set all the folders to check
+    foreach ($map as $namespace => $path) {
+        $dir = setPath($namespace, $path);
+        $dir === false ? : array_push($classFolders, $dir);
+    }
+
+    //loop and include file if found
+    foreach ($classFolders as $folder) {
+        $file = $folder . '/' . $filename;
+        !file_exists($file) ? : include ($file);
+    }
+}
+
+/*
+ * Turn namespaces into directories
+ */
+
+function setPath($prefix, $paths) {
+    $loadDir = $paths . '/' . $prefix;
+    return file_exists($loadDir) ? $loadDir : false;
+}
+
+spl_autoload_register('psr0_autoload');
+
+
+
+
 /* * * a new registry object ** */
 $registry = new registry;
 
