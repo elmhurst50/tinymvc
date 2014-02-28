@@ -5,10 +5,11 @@
 
  /*** define the site path ***/
  $site_path = realpath(dirname(__FILE__));
- define ('__SITE_PATH', $site_path);
+ $back_path = str_replace("\public","",$site_path);
+ define ('__SITE_PATH', $back_path);
 
  /*** include the init.php file ***/
- include 'includes/init.php';
+ include __SITE_PATH . '/includes/init.php';
 
  /*** load the router ***/
  $registry->router = new router($registry);
