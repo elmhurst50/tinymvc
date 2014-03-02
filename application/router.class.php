@@ -75,11 +75,11 @@ class router {
             array_shift($parts);
         }
 
-//set array into associotive array with according values from uri
+        //set array into associotive array with according values from uri
         for ($x = 0; $x < count($parts); $x = $x + 2) {
             $gets[$parts[$x]] = $parts[$x + 1];
         }
-        $this->registry->args = $gets;
+        $this->registry->args = !empty($gets) ? $gets : null;
 
 
         /*         * * check if the action is callable ** */
