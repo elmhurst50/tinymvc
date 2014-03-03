@@ -1,70 +1,78 @@
 <?php
 
 Class Template {
+    /*
+     * @the registry
+     * @access private
+     */
 
-/*
- * @the registry
- * @access private
- */
-private $registry;
+    private $registry;
 
-/*
- * @Variables array
- * @access private
- */
-private $vars = array();
+    /*
+     * @Variables array
+     * @access private
+     */
+    private $vars = array();
 
-/**
- *
- * @constructor
- *
- * @access public
- *
- * @return void
- *
- */
-function __construct($registry) {
-	$this->registry = $registry;
+    
+    /*@the content template
+     * 
+     */
+    
+    public $content;
+    
+    /**
+     *
+     * @constructor
+     *
+     * @access public
+     *
+     * @return void
+     *
+     */
+    function __construct($registry) {
+        $this->registry = $registry;
+    }
 
-}
-
-
- /**
- *
- * @set undefined vars
- *
- * @param string $index
- *
- * @param mixed $value
- *
- * @return void
- *
- */
- public function __set($index, $value)
- {
+    /**
+     *
+     * @set undefined vars
+     *
+     * @param string $index
+     *
+     * @param mixed $value
+     *
+     * @return void
+     *
+     */
+    public function __set($index, $value) {
         $this->vars[$index] = $value;
- }
+    }
 
+    /**
+     * 
+     * @param type $name name of content template file
+     * @param type $path optional directory of the template file
+     * @param string $layout main layout of page
+     * @return boolean
+     * @throws Exception
+     */
+    function show($name, $path = 'content', $layout = 'layout_main') {
+        $this->content = __SITE_PATH . '/views/' . $path . '/' . $name . '.php';
+        $layout =  __SITE_PATH . '/views/' . $layout . '.php';
+        
+        if (file_exists($this->content) == false) {
+            throw new Exception('Template not found in ' . $path);
+            return false;
+        }
 
-function show($name) {
-	$path = __SITE_PATH . '/views' . '/' . $name . '.php';
+        // Load variables
+        foreach ($this->vars as $key => $value) {
+            $$key = $value;
+        }
 
-	if (file_exists($path) == false)
-	{
-		throw new Exception('Template not found in '. $path);
-		return false;
-	}
+        include ($layout);
+    }
 
-	// Load variables
-	foreach ($this->vars as $key => $value)
-	{
-		$$key = $value;
-	}
-
-	include ($path);               
 }
 
-
-}
-
-?>

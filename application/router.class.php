@@ -52,10 +52,10 @@ class router {
         /*         * * check the route ** */
         $parts = $this->getController();
 
-        /*         * * if the file is not there diaf ** */
+        /*         * * if the file is not there assume index ** */
         if (is_readable($this->file) == false) {
-            $this->file = $this->path . '/error404.php';
-            $this->controller = 'error404';
+            $this->file = $this->path . '/indexController.php';
+            $this->controller = 'index';
         } else {
             array_shift($parts); //remove controller to allow uri variable capture
         }
@@ -103,6 +103,8 @@ class router {
      */
     private function getController() {
 
+        $parts = array();
+
         /*         * * get the route from the url ** */
         $route = (empty($_GET['rt'])) ? '' : $_GET['rt'];
 
@@ -111,9 +113,16 @@ class router {
         } else {
             /*             * * get the parts of the route ** */
             $parts = explode('/', $route);
-            $this->controller = $parts[0];
-            if (isset($parts[1])) {
-                $this->action = $parts[1];
+            $checkFile = $this->path . '/' . $parts[0] . 'Controller.php';
+
+            //if a control file exists make it so, else default to index
+            //make the action appropriate too
+            if (file_exists($checkFile)) {
+                $this->controller = $parts[0];
+                !isset($parts[1]) ? : $this->action = $parts[1];
+            } else {
+                $this->controller = 'index';
+                !isset($parts[0]) ? : $this->action = $parts[0];
             }
         }
 

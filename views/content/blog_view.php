@@ -1,0 +1,4 @@
+<?php
+?>
+
+blog viewable
